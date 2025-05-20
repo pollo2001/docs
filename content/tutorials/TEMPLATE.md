@@ -1,107 +1,126 @@
 ---
-title: My Super Awesome Tutorial
-date: 1970-01-01
+title: ESP32-S2 Wi-Fi LED Toggle Tutorial
+date: 2025-05-19
 authors:
-  - name: John Doe
-  - name: Mary Jane
+  - name: Genaro Salazar Ruiz
 ---
 
-![relevant graphic or workshop logo](image/path)
+![ESP32 DevKit Board](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/ESP32-DevKitC.jpg/800px-ESP32-DevKitC.jpg)
 
 ## Introduction
 
-Write a short section on what the tutorial is aiming to accomplish.
-What is the motivation behind the tutorial?
-What do you want readers to gain from the tutorial?
+This tutorial teaches you how to build a simple SoftAP-hosted webpage that lets you control two onboard LEDs on the ESP32-S2 DevKit. The board creates its own Wi-Fi network, and you can control the hardware through your phone or browser—no internet required.
 
 ### Learning Objectives
 
-- Bullet list of skills/concepts to be covered
-
-Any additional notes from the developers can be included here.
+- Create a Soft Access Point with the ESP32
+- Serve an HTML page from the ESP32 itself
+- Toggle GPIO outputs through basic web buttons
 
 ### Background Information
 
-Describe your topic here. What does it do? Why do you use it?
-Are there other similar things to use? What are the pros and cons?
-Explain important concepts that are necessary to understand.
-Include (and cite if needed) any visuals that will help the audience understand.
+The ESP32-S2 is a Wi-Fi-enabled microcontroller that supports hosting its own network using SoftAP mode. Using this, it can serve HTML pages and respond to URL requests. The project focuses on basic GPIO control through the web—a foundational use case for embedded web servers in IoT.
 
 ## Getting Started
 
-For any software prerequisites, write a simple excerpt on each
-technology the participant will be expecting to download and install.
-Aim to demystify the technologies being used and explain any design
-decisions that were taken. Walk through the installation processes
-in detail. Be aware of any operating system differences.
-For hardware prerequisites, list all the necessary components that
-the participant will receive. A table showing component names and
-quantities should suffice. Link any reference sheets or guides that
-the participant may need.
-The following are stylistic examples of possible prerequisites,
-customize these for each workshop.
-
 ### Required Downloads and Installations
 
-List any required downloads and installations here.
-Make sure to include tutorials on how to install them.
-You can either make your own tutorials or include a link to them.
+- [Arduino IDE](https://www.arduino.cc/en/software)
+- ESP32 Board Definitions  
+  Board Manager URL:
 
 ### Required Components
 
-List your required hardware components and the quantities here.
-
-| Component Name | Quanitity |
-| -------------- | --------- |
-|                |           |
-|                |           |
+| Component Name   | Quantity |
+|------------------|----------|
+| ESP32-S2 DevKit  | 1        |
+| USB-C Cable      | 1        |
 
 ### Required Tools and Equipment
 
-List any tools and equipment you need here.
-(Ex, computer, soldering station, etc.)
+- Computer with Arduino IDE installed
+- Web browser (Chrome, Firefox, etc.)
 
-## Part 01: Name
+## Part 01: Wi-Fi LED Control via Web Page
 
 ### Introduction
 
-Briefly introduce what  you are teaching in this section.
+In this section, you'll configure the ESP32-S2 as a Wi-Fi access point and host an HTML page to control two GPIOs connected to LEDs.
 
 ### Objective
 
-- List the learning objectives of this section
+- Set up SoftAP mode
+- Control GPIO 17 and GPIO 18 from a browser
 
 ### Background Information
 
-Give a brief explanation of the technical skills learned/needed
-in this challenge. There is no need to go into detail as a
-separation document should be prepared to explain more in depth
-about the technical skills
+You'll use the ESP32 libraries `<WiFi.h>` and `<WebServer.h>` to set up a server. The client browser will connect to the ESP32's network and send GET requests to specific routes, triggering the LEDs.
 
 ### Components
 
-- List the components needed in this challenge
+- ESP32-S2 DevKit (LEDs on GPIO 17 and 18)
 
 ### Instructional
 
-Teach the contents of this section
+```cpp
+#include <WiFi.h>
+#include <WebServer.h>
 
+#define LED1_PIN 17
+#define LED2_PIN 18
+
+WebServer server(80);
+
+void handleRoot() {
+server.send(200, "text/html", "<html><body>\
+  <h1>LED Control</h1>\
+  <a href='/led1/on'>LED 1 ON</a><br>\
+  <a href='/led1/off'>LED 1 OFF</a><br>\
+  <a href='/led2/on'>LED 2 ON</a><br>\
+  <a href='/led2/off'>LED 2 OFF</a>\
+  </body></html>");
+}
+
+void handleLED1On()  { digitalWrite(LED1_PIN, HIGH); server.send(200, "text/plain", "LED1 ON"); }
+void handleLED1Off() { digitalWrite(LED1_PIN, LOW);  server.send(200, "text/plain", "LED1 OFF"); }
+void handleLED2On()  { digitalWrite(LED2_PIN, HIGH); server.send(200, "text/plain", "LED2 ON"); }
+void handleLED2Off() { digitalWrite(LED2_PIN, LOW);  server.send(200, "text/plain", "LED2 OFF"); }
+
+void setup() {
+pinMode(LED1_PIN, OUTPUT);
+pinMode(LED2_PIN, OUTPUT);
+WiFi.softAP("ESP32_LED_AP", "genny123");
+server.on("/", handleRoot);
+server.on("/led1/on", handleLED1On);
+server.on("/led1/off", handleLED1Off);
+server.on("/led2/on", handleLED2On);
+server.on("/led2/off", handleLED2Off);
+server.begin();
+}
+
+void loop() {
+server.handleClient();
+}
+
+```
 ## Example
 
 ### Introduction
 
-Introduce the example that you are showing here.
+This example shows the complete code that creates an ESP32-based SoftAP, serves a webpage, and allows the user to control two LEDs.
 
 ### Example
 
-Present the example here. Include visuals to help better understanding
+Connect to the ESP32 Wi-Fi network (`ESP32_LED_AP`) using the password `genny123`, then visit `http://192.168.4.1` in your browser. You’ll see LED toggle buttons.
 
 ### Analysis
 
-Explain how the example used your tutorial topic. Give in-depth analysis of each part and show your understanding of the tutorial topic
+This example uses HTML served directly from the microcontroller and leverages the WebServer library to handle URL routing. It’s a lightweight, no-backend-required method to control hardware in real time—perfect for rapid prototyping and IoT demos.
 
 ## Additional Resources
 
 ### Useful links
 
-List any sources you used, documentation, helpful examples, similar projects etc.
+- [ESP32 Arduino Docs](https://docs.espressif.com/projects/arduino-esp32/en/latest/)
+- [ESP32 GitHub Repo](https://github.com/espressif/arduino-esp32)
+- [WebServer Library](https://www.arduino.cc/reference/en/libraries/webserver/)
