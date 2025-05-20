@@ -5,8 +5,6 @@ authors:
   - name: Genaro Salazar Ruiz
 ---
 
-![ESP32 DevKit Board](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/ESP32-DevKitC.jpg/800px-ESP32-DevKitC.jpg)
-
 ## Introduction
 
 This tutorial teaches you how to build a simple SoftAP-hosted webpage that lets you control two onboard LEDs on the ESP32-S2 DevKit. The board creates its own Wi-Fi network, and you can control the hardware through your phone or browser—no internet required.
@@ -111,7 +109,13 @@ This example shows the complete code that creates an ESP32-based SoftAP, serves 
 
 ### Example
 
-Connect to the ESP32 Wi-Fi network (`ESP32_LED_AP`) using password `genny123`, then visit `http://192.168.4.1` in your browser. You’ll see LED toggle buttons.
+Connect to the ESP32 Wi-Fi network (`ESP32_LED_AP`) using the password `genny123`, then visit `http://192.168.4.1` in your browser. You’ll see LED toggle buttons.
+
+### UI Example
+
+If connected and HTML is accessed, you will see this page!
+
+<img width="285" alt="Screenshot 2025-05-19 at 11 03 18 PM" src="https://github.com/user-attachments/assets/0ce5f65f-3b94-4e24-a10e-8a5ef1e26897" />
 
 ### Analysis
 
